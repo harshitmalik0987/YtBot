@@ -1,0 +1,4 @@
+Telethon
+telebot
+python-telegram-bot
+yt-dlp
