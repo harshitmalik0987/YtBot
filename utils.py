@@ -12,7 +12,6 @@ def start_http_server(directory: str, port: int):
     """
     if not os.path.isdir(directory):
         os.makedirs(directory, exist_ok=True)
-    # Handler to serve files from 'directory'
     handler = partial(SimpleHTTPRequestHandler, directory=directory)
     httpd = TCPServer(("", port), handler)
     thread = Thread(target=httpd.serve_forever, daemon=True)
@@ -23,18 +22,19 @@ def get_top_formats(url: str):
     Use yt-dlp to fetch available formats for the given URL.
     Returns a tuple: (list_of_top_video_formats, best_audio_format).
     """
-    ydl_opts = {'quiet': True, 'no_warnings': True}
+    ydl_opts = {
+        'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best',
+        'noplaylist': True,
+        'quiet': True,
+        'no_warnings': True,
+    }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=False)
     formats = info.get('formats', [])
-    # Filter combined audio+video formats
     video_formats = [f for f in formats if f.get('vcodec') != 'none' and f.get('acodec') != 'none']
-    # Sort by resolution (height) descending
     video_formats.sort(key=lambda f: f.get('height', 0), reverse=True)
     top_videos = video_formats[:3]
-    # Filter audio-only formats
     audio_formats = [f for f in formats if f.get('vcodec') == 'none' and f.get('acodec') != 'none']
-    # Sort by audio bitrate descending
     audio_formats.sort(key=lambda f: f.get('abr', 0), reverse=True)
     best_audio = audio_formats[0] if audio_formats else None
     return top_videos, best_audio
