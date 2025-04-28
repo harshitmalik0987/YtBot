@@ -1,13 +1,14 @@
 # config.py
-# Configuration for the Telegram bot and downloader.
+# Configuration for Telegram bot and HTTP server.
 
-# Telegram bot token (replace with your actual token)
-TOKEN = "7952616197:AAFST8tx1_pG3BplY_VJBTyK8BAYpiSK4eo"
+# Telegram bot token (from BotFather)
+BOT_TOKEN = "7952616197:AAFST8tx1_pG3BplY_VJBTyK8BAYpiSK4eo"
 
-# Directory to save downloaded files
-DOWNLOAD_DIR = "downloads"
+# External IP or domain for serving large files (must be accessible publicly)
+EXTERNAL_IP = "34.122.26.12"
 
-# HTTP server settings for serving large files
-HOST = "0.0.0.0"         # Listen on all interfaces
-PORT = 8000              # Port for HTTP server
-BASE_URL = f"http://34.122.26.12:{PORT}/"  # External URL (VM's IP) to access files
+# Port for HTTP server to serve large files
+HTTP_PORT = 8000
+
+# Directory to store downloaded files (should match HTTP server directory)
+DOWNLOAD_PATH = "downloads"
