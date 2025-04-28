@@ -5,7 +5,7 @@
 BOT_TOKEN = "7952616197:AAFST8tx1_pG3BplY_VJBTyK8BAYpiSK4eo"
 
 # External IP or domain for serving large files (must be accessible publicly)
-EXTERNAL_IP = "34.122.26.12"
+EXTERNAL_IP = "34.170.90.198"
 
 # Port for HTTP server to serve large files
 HTTP_PORT = 8000
