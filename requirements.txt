@@ -1,4 +1,2 @@
-Telethon
-telebot
-python-telegram-bot
+python-telegram-bot>=20.0
 yt-dlp
