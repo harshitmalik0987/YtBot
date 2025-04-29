@@ -1,3 +1,6 @@
-python-telegram-bot>=20.0
-yt-dlp
-aiohttp
+python-telegram-bot==13.15
+yt-dlp==2024.01.30
+google-cloud-storage==2.11.0
+google-crc32c==1.5.0
+urllib3==1.26.16
+six==1.16.0
