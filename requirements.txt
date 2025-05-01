@@ -1,3 +1,1 @@
-python-telegram-bot==13.15
-yt-dlp>=2021.12.1
-google-cloud-storage>=2.0.0
+_DCPzA~C?2*Le=a
