@@ -21,7 +21,7 @@ from google.cloud import storage
 
 # ─── Configuration ────────────────────────────────────────────────────────────
 
-TELEGRAM_TOKEN = '7952616197:AAGmLLM5r8b9VxPAPKm9lt1VzO3ck8KW5qY'
+TELEGRAM_TOKEN = '7952616197:AAHaUzEt37uL44CUC9RsJwbZs1TAqnL4CRo'
 STORAGE_BUCKET = 'ankushmalikbot'
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 SERVICE_JSON = os.path.join(BASE_DIR, 'healthy-hearth-458109-u8-3427749c236e.json')
