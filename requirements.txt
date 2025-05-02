@@ -1,1 +1,3 @@
-_DCPzA~C?2*Le=a
+python-telegram-bot==13.15
+yt-dlp
+google-cloud-storage
