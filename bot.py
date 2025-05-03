@@ -6,16 +6,16 @@ import html
 import time
 import json
 import threading
-from datetime import datetime
+from datetime import datetime, timedelta
 from io import BufferedReader, FileIO
 from collections import defaultdict, deque
 
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ChatAction
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ChatAction, InputMediaPhoto
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler, CallbackContext
 import yt_dlp
 from google.cloud import storage
 
-# Patch imghdr if missing (for environments without PIL, etc.)
+# Patch imghdr if missing
 try:
     import imghdr
 except ModuleNotFoundError:
@@ -86,16 +86,14 @@ user_queues = defaultdict(deque)
 user_locks = defaultdict(threading.Lock)
 
 def process_next_in_queue(user_id, context):
-    """Starts the next queued download for a user, if any."""
     if user_queues[user_id]:
         job = user_queues[user_id].popleft()
         threading.Thread(target=job, daemon=True).start()
     else:
         with user_locks[user_id]:
-            pass  # lock released, nothing queued
+            pass
 
 # --- Bot Handlers ---
-
 def start(update: Update, context: CallbackContext):
     update.message.reply_text(
         "<b>Welcome!</b> 👋\nSend a YouTube, Twitter, Instagram, or any video link and I'll help you download it!\n"
@@ -160,33 +158,49 @@ def handle_link(update: Update, context: CallbackContext):
 
     context.user_data['yt_info'] = info
     formats = info.get('formats', [])
-    vids = [f for f in formats if f.get('vcodec') != 'none']
-    auds = [f for f in formats if f.get('vcodec') == 'none']
-
-    if not vids and not auds:
-        return update.message.reply_text("⚠️ No downloadable formats found.")
-
-    vids = sorted(vids, key=lambda f: f.get('height') or 0, reverse=True)[:3]
-    best_audio = max(auds, key=lambda f: f.get('abr') or 0) if auds else None
+    video_formats = [f for f in formats if f.get('vcodec') != 'none']
+    audio_formats = [f for f in formats if f.get('vcodec') == 'none']
 
     buttons = []
-    for v in vids:
+    # Add all video+audio formats (progressive = has both)
+    progressive = [f for f in video_formats if f.get('acodec') != 'none']
+    if progressive:
+        for v in sorted(progressive, key=lambda f: (f.get('height') or 0), reverse=True):
+            fid = v.get('format_id')
+            ext = v.get('ext')
+            res = v.get('height', 'Unknown')
+            size = v.get('filesize') or 0
+            size_text = f"{size//(1024*1024)}MB" if size else ''
+            buttons.append([InlineKeyboardButton(f"📹 {res}p ({ext}) {size_text}", callback_data=f"vid_{fid}")])
+
+    # Add all video-only formats (to be merged with best audio)
+    for v in sorted([f for f in video_formats if f.get('acodec') == 'none'], key=lambda f: (f.get('height') or 0), reverse=True):
         fid = v.get('format_id')
         ext = v.get('ext')
         res = v.get('height', 'Unknown')
         size = v.get('filesize') or 0
         size_text = f"{size//(1024*1024)}MB" if size else ''
-        buttons.append([InlineKeyboardButton(f"📹 {res}p {ext} {size_text}", callback_data=f"vid_{fid}")])
-    if best_audio:
-        fid = best_audio.get('format_id')
-        ext = best_audio.get('ext')
-        abr = best_audio.get('abr', 'Unknown')
-        size = best_audio.get('filesize') or 0
+        buttons.append([InlineKeyboardButton(f"🎬 {res}p (No audio, {ext}) {size_text}", callback_data=f"vid_{fid}")])
+
+    # Add all audio-only formats
+    for a in sorted(audio_formats, key=lambda f: (f.get('abr') or 0), reverse=True):
+        fid = a.get('format_id')
+        ext = a.get('ext')
+        abr = a.get('abr', 'Unknown')
+        size = a.get('filesize') or 0
         size_text = f"{size//(1024*1024)}MB" if size else ''
         buttons.append([InlineKeyboardButton(f"🎵 {abr}kbps {ext} {size_text}", callback_data=f"aud_{fid}")])
+
+    # Option: Extract audio as mp3
     buttons.append([InlineKeyboardButton("🎧 Extract audio only (mp3)", callback_data="audio_mp3")])
 
     title = html.escape(info.get('title', 'media'))
+    thumb_url = info.get('thumbnail')
+
+    # Send thumbnail as photo with caption, then format selection as reply
+    if thumb_url:
+        update.message.reply_photo(photo=thumb_url, caption=f"<b>{title}</b>", parse_mode='HTML')
+
     update.message.reply_text(
         f"📥 <b>Choose a format for:</b> <i>{title}</i>",
         reply_markup=InlineKeyboardMarkup(buttons),
@@ -203,7 +217,6 @@ def handle_format_selection(update: Update, context: CallbackContext):
         finally:
             process_next_in_queue(user_id, context)
 
-    # If already downloading, queue it, else start immediately
     with user_locks[user_id]:
         if user_queues[user_id]:
             query.answer("Another download is in progress for you. Your request is queued.", show_alert=True)
@@ -243,6 +256,7 @@ def _handle_format_selection_threadsafe(update: Update, context: CallbackContext
             except Exception:
                 pass
 
+    # --- Improved: Always merge video+audio ---
     if data == "audio_mp3":
         ydl_opts = {
             "format": "bestaudio/best",
@@ -256,8 +270,19 @@ def _handle_format_selection_threadsafe(update: Update, context: CallbackContext
                 "preferredquality": "192",
             }]
         }
-    else:
-        kind, fmt_id = data.split("_", 1)
+    elif data.startswith("vid_"):
+        fmt_id = data.split("_", 1)[1]
+        # Use bestaudio+format_id to merge video+audio if needed
+        ydl_opts = {
+            "format": f"{fmt_id}+bestaudio/best",
+            "outtmpl": out_template,
+            "quiet": True,
+            "cookiefile": os.path.join(BASE_DIR, "cookies.txt"),
+            "progress_hooks": [download_progress],
+            "merge_output_format": "mp4",  # Ensure output is mp4 after merging
+        }
+    elif data.startswith("aud_"):
+        fmt_id = data.split("_", 1)[1]
         ydl_opts = {
             "format": fmt_id,
             "outtmpl": out_template,
@@ -265,6 +290,8 @@ def _handle_format_selection_threadsafe(update: Update, context: CallbackContext
             "cookiefile": os.path.join(BASE_DIR, "cookies.txt"),
             "progress_hooks": [download_progress],
         }
+    else:
+        return query.edit_message_text("❌ Unknown format selected.")
 
     msg = query.edit_message_text(f"⬇️ Downloading <b>{title}</b>...", parse_mode='HTML')
     chat_id = msg.chat_id
@@ -315,25 +342,16 @@ def _upload_to_bucket(context: CallbackContext, chat_id, filepath):
     blob = bucket.blob(os.path.basename(filepath))
     blob.chunk_size = 2 * 1024 * 1024
 
-    def upload_progress(position, total):
-        now = time.time()
-        if not hasattr(upload_progress, 'last_update'):
-            upload_progress.last_update = 0
-        if (now - upload_progress.last_update) >= 1 or position == total:
-            percent = position * 100 / total if total else 0
-            text = f"☁️ Uploading... {percent:.0f}%"
-            try:
-                context.bot.edit_message_text(text, chat_id, wait_id)
-            except Exception:
-                pass
-            upload_progress.last_update = now
-
-    pf = ProgressFile(filepath, upload_progress)
+    # --- Set auto-delete after 24h (GCS "temporary hold" is not for this, use lifecycle or set custom time-based deletion) ---
+    expires_at = datetime.utcnow() + timedelta(hours=24)
+    blob.metadata = {'delete_at': expires_at.isoformat()}
+    pf = ProgressFile(filepath, lambda pos, total: _upload_progress(context, chat_id, wait_id, pos, total))
     try:
         blob.upload_from_file(pf, timeout=900)
+        # Set GCS lifecycle rule to auto-delete (recommended, see below)
         public_url = f"https://storage.googleapis.com/{STORAGE_BUCKET}/{os.path.basename(filepath)}"
         context.bot.edit_message_text(
-            f"☁️ Upload complete!\n🔗 <b>Download link:</b>\n{public_url}",
+            f"☁️ Upload complete!\n🔗 <b>Download link (valid for 24h):</b>\n{public_url}",
             chat_id, wait_id,
             parse_mode='HTML'
         )
@@ -350,11 +368,35 @@ def _upload_to_bucket(context: CallbackContext, chat_id, filepath):
             context.bot.send_message(chat_id, f"❌ Upload failed: {err}")
     finally:
         pf.close()
-        try:  # Always auto-delete after upload
+        try:
             if os.path.exists(filepath):
                 os.remove(filepath)
         except Exception:
             pass
+
+def _upload_progress(context, chat_id, wait_id, position, total):
+    now = time.time()
+    if not hasattr(_upload_progress, 'last_update'):
+        _upload_progress.last_update = 0
+    if (now - _upload_progress.last_update) >= 1 or position == total:
+        percent = position * 100 / total if total else 0
+        text = f"☁️ Uploading... {percent:.0f}%"
+        try:
+            context.bot.edit_message_text(text, chat_id, wait_id)
+        except Exception:
+            pass
+        _upload_progress.last_update = now
+
+# --- GCS Lifecycle Management (recommended, set once!) ---
+# In Google Cloud Console: Storage > your-bucket > "Lifecycle" > Add Rule: "Age" = 1 Day, "Delete"
+# Or via code:
+# from google.cloud import storage
+# def set_lifecycle(bucket):
+#     rule = {"action": {"type": "Delete"}, "condition": {"age": 1}}
+#     bucket.add_lifecycle_delete_rule(age=1)
+#     bucket.patch()
+# set_lifecycle(bucket)
+# Only needs to be run once, not in the main bot loop.
 
 def error_handler(update, context):
     logger.error("Exception while handling update:", exc_info=context.error)
