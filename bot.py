@@ -99,7 +99,7 @@ def process_next_in_queue(user_id, context):
 def start(update: Update, context: CallbackContext):
     update.message.reply_text(
         "<b>Welcome!</b> 👋\nSend a YouTube, Twitter, Instagram, or any video link and I'll help you download it!\n"
-        "<b>Note:</b> Each user request is queued. Only 1 active download per user at a time.\n"
+        "<b>Note:</b> Admin of Bot @ankush_malik Contact for Remove Limit\n"
         "Type /help for more info.",
         parse_mode='HTML'
     )
@@ -112,7 +112,7 @@ def help_cmd(update: Update, context: CallbackContext):
         "3. The file will be sent directly, or a download link will be provided if too large.\n\n"
         "<b>Limits:</b>\n"
         "• 2GB download limit per user per day.\n"
-        "• Only video/audio links are accepted.\n"
+        "•Contact @ankush_malik for Remove Limit and other Support\n"
         "• /usage — See your daily download usage.",
         parse_mode='HTML'
     )
