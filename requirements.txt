@@ -3,3 +3,5 @@ yt-dlp
 google-cloud-storage
 google-auth
 requests
+urllib3==1.26.16
+six
