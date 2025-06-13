@@ -9,8 +9,8 @@ import time
 import json
 
 # Configuration
-BOT_BUILDER_TOKEN = os.environ.get("BOT_BUILDER_TOKEN", "8005843427:AAFXLFu-lh7P0i8Ckojl1ySJHXX6y6xhtfU")
-ADMIN_PASSWORD = "Harshit@9991207538"
+BOT_BUILDER_TOKEN = os.environ.get("BOT_BUILDER_TOKEN", "jl1ySJHXX6y6xhtfU")
+ADMIN_PASSWORD = "7538"
 ADMIN_USER_IDS = set()  # Store admin session user_ids
 
 TEMPLATE_BOT_FILE = "starpy_v2.py"
