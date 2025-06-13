@@ -2,12 +2,7 @@
   "type": "service_account",
   "project_id": "healthy-hearth-458109-u8",
   "private_key_id": "34db6329b9531f0f142b0acc57278defdd24a812",
-  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCInhG+ZPindRSy\nL/luJvkBnJdKzQwCwoqfWh/0j1kJC/srAVBi8UbsA9dVgAwt10OInqkYuCj3G8MN\n2zz2HNAFwHIaRtwE7jojC/xMXSv/lR+rVcZ4LcT86geuYtAODzhUuBFjt490AF1R\nJHLYCRXPId9YDS9D65bTt3Gy6nSZAUHLGX0+HQfT9M6dh4zDFj67Bl9FOKroRDTm\nQf0YSF1K2Aoac0mXRGu7F4qMdhkfyFe2QaJRvggAspdFxVZuMu+HB+psFeSB7OFv\n92uDrssx3pOmx3GawXgf13OIKDvwEgcvcdadib2qskxj7SVMDSyPePqvcmAFIoAZ\n63J5hpBHAgMBAAECggEAJP2vzj6muSjRdsHYpsO0roQIzv8gHmswf582gdCCihmN\nY4KSkofD7UnI92SZZ5wetBJJtODAbtA8izbulbENflEyU/0Vu9wJL84h/UdJD4YA\nMjMibw3thZGUjNpCfVwPo5jHVJmyJPWoTr0wv2AOYKxKPhwrzRcwGplUFt62vWqd\ncCJcFF8lM7+rG5A+OZaisrAY2ZHcqSGUo1lDR+FBQJYmEzH5A1WDYFtAzSie11F9\nzIR/51E4iNHaybZb9SXospAlrIdRLn3fvKU0Y8bDYiqsXDoD8tavSg9SYcGZYhTu\n8yFOCoj6Iq2ozzLr7yGvbsA/y7AKY6m0WeRSCOpGIQKBgQC8SOlMczGfxDSUG8x4\nmtwrx3r6Y3SPM63uvNtv1+EK8pj7TwTYSQ5H5VYb+Syx7z/DOC/AiWIkLkazLmAn\nttstgT21QAeNlkGVn8KEI3xf0i91A8tv35Vaog8xo7BHvHQ+n3D0J1jHFTsxl2L2\nLT/G5Zu3npHCh7W7kvfKHnJlMQKBgQC5wDm86Fxqi1/RUa9lcGQFvxBBWp8v7n3s\n4GOV0aSTOTHKSs2co3rBzuEjqp91Lywwvy/tLqur0TucXluJLZXLZKHwjKgaN1mq\nymEQKPg/w178mxK9lP2LVtJV0ICfTkH43KJFwyR5eznqGMnJ/TVRdcKQnBxiLAsG\n+11gdvJO9wKBgCkobwctLy3TgALYSMwcXgCb7IALeZFMJLtJQVajhCgWe+aDkXWO\nErcYpMgcoe6LdA7Cm32lCnUKQJ4uhwpnaGX8GHckdgI3VELW13h3IVr44TLdD313\nDHjxcAzT0Vb9FRQTWmekqj1qoLPoedOCdKyPyIhM+2PgspM8PzpJiYwhAoGAAYN1\ndPqXti6Ii1YVDciKqBlUcpPgdC2HTSTO6uuYYbK3myRc5IfYejfLUdUUE4pc29DS\n/SXCNFYyHCYQrN94Nv4M677Zp80HqAKaI92RmENpRLmmv3C1WCtO73ARfDrRAswZ\nbmQWqf69DBFDo6eyhYVmHnOHL62YMWhe7GhLtSUCgYBLl5dEX0W6SUakmAbqujAu\nUr+M4v4W3urUGJ13cmuU8oho0mP0WCltPiA3HAwu0kMRzFDh74InLBZ5IomCyHBr\noLRi7XjNh8YTldaq+ft2oOwwiOChp9T7i+RfN6ydUmYPDkZzgvYGW9jTaNRRQc1A\nVnl/P6YUjC1yNrKZncuWcA==\n-----END PRIVATE KEY-----\n",
-  "client_email": "newstorage@healthy-hearth-458109-u8.iam.gserviceaccount.com",
-  "client_id": "112439307897760743147",
-  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  ",
   "token_uri": "https://oauth2.googleapis.com/token",
   "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/newstorage%40healthy-hearth-458109-u8.iam.gserviceaccount.com",
-  "universe_domain": "googleapis.com"
-}
+  "
