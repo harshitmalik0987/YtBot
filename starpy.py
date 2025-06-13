@@ -4,7 +4,7 @@ import sqlite3
 from datetime import datetime
 
 # --- BOT CONFIGURATION ---
-TOKEN = "7974975342:AAFvSqbfEjwvIwT2ahAkAj-RT-yP25U8DYY"  # <-- Use your valid token here
+TOKEN = "797497EjwvIwT2ahAkAj-RT-yP25U8DYY"  # <-- Use your valid token here
 bot = telebot.TeleBot(TOKEN, parse_mode="HTML")
 PAYOUT_CHANNEL = "@TR_PayOutChannel"
 ADMIN_PASSWORD = "Harshit@1234"
